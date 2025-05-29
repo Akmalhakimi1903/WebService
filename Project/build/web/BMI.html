@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BMI Result</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 600px;
+                margin: 40px auto;
+                padding: 20px;
+                background: #f9f9f9;
+                border-radius: 8px;
+                box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            }
+            h1 {
+                text-align: center;
+            }
+            p {
+                font-size: 18px;
+                margin: 12px 0;
+            }
+            a#backLink {
+                display: inline-block;
+                margin-top: 25px;
+                background-color: #007acc;
+                color: white;
+                text-decoration: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            a#backLink:hover {
+                background-color: #005f99;
+            }
+            span {
+                font-weight: bold;
+            }
+        </style>
+
+        <script>
+            window.onload = function () {
+            const params = new URLSearchParams(window.location.search);
+                    const name = params.get("name");
+                    const ic = params.get("ic");
+                    const gender = params.get("gender");
+                    const weight = params.get("weight");
+                    const height = params.get("height");
+                    const age = params.get("age");
+                    const bmi = params.get("bmi");
+                    document.getElementById("name").textContent = name || "Unknown";
+                    document.getElementById("gender").textContent = gender || "N/A";
+                    document.getElementById("weight").textContent = weight || "N/A";
+                    document.getElementById("height").textContent = height || "N/A";
+                    document.getElementById("age").textContent = age || "N/A";
+                    document.getElementById("bmi").textContent = bmi || "N/A";
+                    const backLink = document.getElementById("backLink");
+                    const queryData = new URLSearchParams();
+                    for (const [key, value] of params.entries()) {
+            if (key !== "bmi") {
+            queryData.append(key, value);
+            }
+            }
+            backLink.href = "index.html?" + queryData.toString();
+            };
+        </script>
+    </head>
+    <body>
+        <h1>BMI Result</h1>
+
+        <p>Name: <span id="name"></span></p>
+        <p>Age: <span id="age"></span></p>
+        <p>Gender: <span id="gender"></span></p>
+        <p>Weight (kg): <span id="weight"></span></p>
+        <p>Height (cm): <span id="height"></span></p>
+        <p>Your BMI is: <span id="bmi"></span></p>
+
+        <a id="backLink" href="index.html">Back to Calculator</a>
+    </body>
+</html>
