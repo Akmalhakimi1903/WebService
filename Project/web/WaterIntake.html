@@ -6,24 +6,30 @@
   <title>Water Intake Calculator</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 700px;
       margin: 40px auto;
       padding: 20px;
-      background: #f9f9f9;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #007acc;
+      margin-bottom: 10px;
     }
     label {
       font-weight: bold;
       display: block;
       margin-top: 15px;
+      color: #333;
     }
     input[type="number"] {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 5px;
-      border-radius: 4px;
+      border-radius: 6px;
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
@@ -32,33 +38,55 @@
       background-color: #007acc;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 24px;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 16px;
+      transition: background 0.3s ease;
     }
     button:hover {
       background-color: #005f99;
     }
     .result {
       margin-top: 30px;
-      padding: 15px;
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .result p {
       margin: 8px 0;
     }
+    #backButton {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .quote-box {
+      margin-top: 30px;
+      padding: 15px;
+      border-left: 4px solid #007acc;
+      background: #f0f9ff;
+      border-radius: 6px;
+      font-style: italic;
+      font-size: 1.1em;
+      color: #333;
+      animation: fadeIn 2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
-  <h1>Water Intake Calculator</h1>
+  <h1>💧 Water Intake Calculator</h1>
 
   <form id="waterForm">
     <label for="activityMinutes">Activity Duration (minutes):</label>
     <input type="number" id="activityMinutes" name="activityMinutes" min="0" placeholder="Enter activity duration" required />
-
     <button type="submit">Calculate Water Intake</button>
   </form>
 
@@ -71,9 +99,11 @@
     <p><strong>Height (cm):</strong> <span id="resHeight"></span></p>
     <p><strong>Activity Duration (minutes):</strong> <span id="resActivity"></span></p>
     <p><strong>Recommended Water Intake (liters):</strong> <span id="resWaterIntake"></span></p>
+
+    <div class="quote-box" id="quoteBox"></div>
   </div>
 
-  <button id="backButton" type="button">Back to Calculator</button>
+  <button id="backButton" type="button">🔙 Back to Calculator</button>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -85,6 +115,19 @@
       height: parseFloat(params.get("height")) || 0,
       ic: params.get("ic") || ""
     };
+
+    const quotes = [
+      "“Drinking water is like washing out your insides.” – Kevin R. Stone",
+      "“Pure water is the world’s first and foremost medicine.” – Slovakian Proverb",
+      "“You are not sick, you are thirsty. Don’t treat thirst with medication.” – F. Batmanghelidj",
+      "“Water is life’s matter and matrix, mother and medium. There is no life without water.” – Albert Szent-Gyorgyi",
+      "“Thousands have lived without love, not one without water.” – W.H. Auden",
+      "“Stay hydrated, stay healthy.” – Anonymous"
+    ];
+
+    function getRandomQuote() {
+      return quotes[Math.floor(Math.random() * quotes.length)];
+    }
 
     function calculateWaterIntake(weightKg, activityMinutes) {
       const baseMl = 35 * weightKg;
@@ -113,7 +156,11 @@
       document.getElementById("resActivity").textContent = activityMinutes;
       document.getElementById("resWaterIntake").textContent = waterIntake;
 
+      document.getElementById("quoteBox").textContent = getRandomQuote();
+
       document.getElementById("result").style.display = "block";
+      document.getElementById("backButton").style.display = "block";
+      document.getElementById("result").scrollIntoView({ behavior: "smooth" });
     });
 
     document.getElementById("backButton").addEventListener("click", function () {
