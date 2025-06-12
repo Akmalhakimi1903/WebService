@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BMI Result with Calculation</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 700px;
+                margin: 40px auto;
+                padding: 20px;
+                background: #f9f9f9;
+                border-radius: 8px;
+                box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            }
+            h1 {
+                text-align: center;
+            }
+            p {
+                font-size: 18px;
+                margin: 12px 0;
+            }
+            pre {
+                background-color: #efefef;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+            a#backLink {
+                display: inline-block;
+                margin-top: 25px;
+                background-color: #007acc;
+                color: white;
+                text-decoration: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            a#backLink:hover {
+                background-color: #005f99;
+            }
+            span {
+                font-weight: bold;
+            }
+            .normal { color: green; }
+            .warning { color: orange; }
+            .danger { color: red; }
+        </style>
+    </head>
+    <body>
+        <script>
+            function calculateBMI(weightKg, heightCm) {
+                let heightM = heightCm / 100;
+                return weightKg / (heightM * heightM);
+            }
+
+            function classifyBMI(bmi) {
+                if (bmi < 18.5) {
+                    return { category: "Underweight (BMI < 18.5)", cssClass: "warning" };
+                } else if (bmi < 24.9) {
+                    return { category: "Normal weight (18.5 - 24.9)", cssClass: "normal" };
+                } else if (bmi < 29.9) {
+                    return { category: "Overweight (25 - 29.9)", cssClass: "warning" };
+                } else {
+                    return { category: "Obesity (BMI ≥ 30)", cssClass: "danger" };
+                }
+            }
+
+            window.onload = function () {
+                const params = new URLSearchParams(window.location.search);
+
+                const name = params.get("name");
+                const ic = params.get("ic");
+                const gender = params.get("gender");
+                const weight = parseFloat(params.get("weight")) || 0;
+                const height = parseFloat(params.get("height")) || 0;
+                const age = params.get("age");
+
+                const bmi = calculateBMI(weight, height);
+                const classification = classifyBMI(bmi);
+
+                document.getElementById("name").textContent = name || "Unknown";
+                document.getElementById("gender").textContent = gender || "N/A";
+                document.getElementById("weight").textContent = weight || "N/A";
+                document.getElementById("height").textContent = height || "N/A";
+                document.getElementById("age").textContent = age || "N/A";
+                document.getElementById("bmiValue").textContent = bmi.toFixed(2);
+                
+                document.getElementById("bmiCategory").textContent = classification.category;
+                document.getElementById("bmiCategory").className = classification.cssClass;
+
+                document.getElementById("bmiFormula").textContent = "BMI = weight (kg) / (height (m))²";
+                document.getElementById("bmiCalc").textContent = 
+                    `BMI = ${weight} / (${(height/100).toFixed(2)} × ${(height/100).toFixed(2)})`;
+
+                const backLink = document.getElementById("backLink");
+                const queryData = new URLSearchParams();
+                for (const [key, value] of params.entries()) {
+                    if (key !== "bmi") {
+                        queryData.append(key, value);
+                    }
+                }
+                backLink.href = "index.html?" + queryData.toString();
+            };
+        </script>
+
+        <h1>BMI Result (with Calculation)</h1>
+
+        <p>Name: <span id="name"></span></p>
+        <p>Age: <span id="age"></span></p>
+        <p>Gender: <span id="gender"></span></p>
+        <p>Weight (kg): <span id="weight"></span></p>
+        <p>Height (cm): <span id="height"></span></p>
+
+        <h2>Step-by-step Calculation:</h2>
+        <p><b>Formula Used:</b></p>
+        <pre id="bmiFormula"></pre>
+
+        <p><b>Calculation:</b></p>
+        <pre id="bmiCalc"></pre>
+
+        <p>Your BMI is: <span id="bmiValue"></span></p>
+        <p>Your BMI Category is: <span id="bmiCategory"></span></p>
+
+        <a id="backLink" href="index.html">Back to Calculator</a>
+    </body>
+</html>
