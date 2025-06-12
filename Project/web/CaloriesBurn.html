@@ -75,6 +75,7 @@
     <p>Activity Level: <span id="activityLevelDisplay"></span></p>
     <p><strong>BMR (Basal Metabolic Rate):</strong> <span id="bmr"></span> kcal/day</p>
     <p><strong>Calories Burned:</strong> <span id="caloriesBurned"></span> kcal/day</p>
+    <p><strong>Formula Used:</strong> <span id="formulaUsed"></span></p>
   </div>
 
   <button id="backButton" type="button">Back to Calculator</button>
@@ -122,6 +123,7 @@
 
       document.getElementById("activityLevelDisplay").textContent = activityText;
       document.getElementById("caloriesBurned").textContent = caloriesBurned.toFixed(2);
+      document.getElementById("formulaUsed").textContent = `${userData.bmr.toFixed(2)} × ${multiplier} = ${caloriesBurned.toFixed(2)}`;
 
       document.getElementById("result").style.display = "block";
     });
@@ -141,3 +143,4 @@
   </script>
 </body>
 </html>
+
