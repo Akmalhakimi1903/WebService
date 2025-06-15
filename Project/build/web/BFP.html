@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BFP Result with Calculation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #80deea);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #00796b;
+      margin-top: 30px;
+    }
+    p {
+      font-size: 16px;
+      margin: 12px 0;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    a.button-link {
+      display: inline-block;
+      margin: 15px 10px 0 0;
+      background-color: #00796b;
+      color: white;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    a.button-link:hover {
+      background-color: #004d40;
+    }
+    a.referenceLink {
+      font-size: 14px;
+      color: #00796b;
+      text-decoration: underline;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    span {
+      font-weight: bold;
+    }
+    .normal { color: #00796b; }
+    .warning { color: #ffa000; }
+    .danger { color: #d32f2f; }
+  </style>
+  <script>
+    function calculateBMI(weightKg, heightCm) {
+      let heightM = heightCm / 100;
+      return weightKg / (heightM * heightM);
+    }
+    function calculateBFP(gender, age, bmi) {
+      let bfp, formula = "", formulaLabel = "";
+      if (gender.toLowerCase() === "male") {
+        bfp = (1.20 * bmi) + (0.23 * age) - 10.8;
+        formula = "BFP = 1.20 × BMI + 0.23 × Age - 10.8";
+        formulaLabel = "Formula for Male: BFP = 1.20 × BMI + 0.23 × Age - 10.8";
+      } else if (gender.toLowerCase() === "female") {
+        bfp = (1.20 * bmi) + (0.23 * age) - 5.4;
+        formula = "BFP = 1.20 × BMI + 0.23 × Age - 5.4";
+        formulaLabel = "Formula for Female: BFP = 1.20 × BMI + 0.23 × Age - 5.4";
+      } else {
+        bfp = NaN;
+      }
+      return { bfp: Math.round(bfp * 100) / 100, formula, formulaLabel };
+    }
+    function classifyBFP(gender, bfp) {
+      if (gender.toLowerCase() === "male") {
+        if (bfp < 6) return { category: "Essential Fat (BFP < 6%)", explanation: "Minimal fat required for bodily functions.", cssClass: "warning" };
+        else if (bfp <= 13) return { category: "Athletes (6% - 13%)", explanation: "Excellent fitness level.", cssClass: "normal" };
+        else if (bfp <= 17) return { category: "Fitness (14% - 17%)", explanation: "Good fitness level.", cssClass: "normal" };
+        else if (bfp <= 24) return { category: "Average (18% - 24%)", explanation: "Acceptable body fat.", cssClass: "warning" };
+        else return { category: "Obese (BFP > 24%)", explanation: "High health risk.", cssClass: "danger" };
+      } else if (gender.toLowerCase() === "female") {
+        if (bfp < 14) return { category: "Essential Fat (BFP < 14%)", explanation: "Minimal fat required for bodily functions.", cssClass: "warning" };
+        else if (bfp <= 20) return { category: "Athletes (14% - 20%)", explanation: "Excellent fitness level.", cssClass: "normal" };
+        else if (bfp <= 24) return { category: "Fitness (21% - 24%)", explanation: "Good fitness level.", cssClass: "normal" };
+        else if (bfp <= 31) return { category: "Average (25% - 31%)", explanation: "Acceptable body fat.", cssClass: "warning" };
+        else return { category: "Obese (BFP > 31%)", explanation: "High health risk.", cssClass: "danger" };
+      } else {
+        return { category: "Invalid gender input", explanation: "", cssClass: "danger" };
+      }
+    }
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get("name") || "Unknown";
+      const gender = params.get("gender") || "N/A";
+      const weight = parseFloat(params.get("weight")) || 0;
+      const height = parseFloat(params.get("height")) || 0;
+      const age = parseInt(params.get("age")) || 0;
+      const bmi = calculateBMI(weight, height);
+      const { bfp, formula, formulaLabel } = calculateBFP(gender, age, bmi);
+      document.getElementById("name").textContent = name;
+      document.getElementById("gender").textContent = gender;
+      document.getElementById("weight").textContent = weight;
+      document.getElementById("height").textContent = height;
+      document.getElementById("age").textContent = age;
+      if (!isNaN(bfp)) {
+        const bfpCategory = classifyBFP(gender, bfp);
+        document.getElementById("bmiFormula").textContent = `BMI = weight (kg) / (height (m))²`;
+        document.getElementById("bmiValue").textContent = bmi.toFixed(2);
+        document.getElementById("bfpFormulaLabel").textContent = formulaLabel;
+        document.getElementById("bfpFormula").textContent = formula;
+        document.getElementById("bfpCalc").textContent = `BFP = 1.20 × ${bmi.toFixed(2)} + 0.23 × ${age} ${gender.toLowerCase() === "male" ? "- 10.8" : "- 5.4"}`;
+        document.getElementById("bfpValue").textContent = bfp + " %";
+        document.getElementById("bfpCategory").textContent = bfpCategory.category;
+        document.getElementById("bfpExplanation").textContent = bfpCategory.explanation;
+        document.getElementById("bfpCategory").className = bfpCategory.cssClass;
+      } else {
+        document.getElementById("bfpValue").textContent = "Invalid gender input";
+      }
+      const backLink = document.getElementById("backLink");
+      const queryData = new URLSearchParams();
+      for (const [key, value] of params.entries()) {
+        queryData.append(key, value);
+      }
+      backLink.href = "index.html?" + queryData.toString();
+    };
+  </script>
+</head>
+<body>
+<div class="container">
+  <h1>BFP Result (with Calculation)</h1>
+  <p>Name: <span id="name"></span></p>
+  <p>Age: <span id="age"></span></p>
+  <p>Gender: <span id="gender"></span></p>
+  <p>Weight (kg): <span id="weight"></span></p>
+  <p>Height (cm): <span id="height"></span></p>
+
+  <h2>Step-by-step Calculation:</h2>
+  <p><b>Step 1 - Calculate BMI:</b></p>
+  <pre id="bmiFormula"></pre>
+  <p>Calculated BMI: <span id="bmiValue"></span></p>
+
+  <p><b>Step 2 - Formula Used:</b></p>
+  <pre id="bfpFormulaLabel"></pre>
+  <p><a class="referenceLink" href="https://pubmed.ncbi.nlm.nih.gov/2043597/" target="_blank">View Original Study (Deurenberg et al., 1991)</a></p>
+
+  <p><b>Step 3 - Calculate BFP:</b></p>
+  <pre id="bfpFormula"></pre>
+  <pre id="bfpCalc"></pre>
+
+  <p>Your Body Fat Percentage is: <span id="bfpValue"></span></p>
+  <p>Your BFP Category is: <span id="bfpCategory"></span></p>
+  <p>Explanation: <span id="bfpExplanation"></span></p>
+
+  <h2>About Body Composition</h2>
+  <p>Body composition is the proportion of fat, bone, water, and muscle in the body. Unlike BMI, it gives a more accurate picture of your health. Two people may have the same weight but different compositions.</p>
+  <p><b>Main Components:</b> Fat mass (essential and storage fat) and lean body mass (muscles, bones, water, organs).</p>
+  <p><b>Health Importance:</b> High body fat can lead to higher risks of heart disease, diabetes, and other conditions. A balanced body composition improves performance and lowers health risks.</p>
+  <p><b>How to Measure:</b> Skinfold measurements, bioelectrical impedance, DEXA scan, hydrostatic weighing, and air displacement plethysmography.</p>
+  <p><b>How to Improve:</b> Strength training, cardio, proper nutrition, and consistency over time.</p>
+
+  <a id="backLink" class="button-link" href="index.html">Back to Calculator</a>
+  <a class="button-link" href="https://www.webmd.com/fitness-exercise/what-is-body-composition" target="_blank">Learn More About Body Composition</a>
+</div>
+</body>
+</html>

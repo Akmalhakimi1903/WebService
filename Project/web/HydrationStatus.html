@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hydration Status Result with Calculation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+            color: #00796b;
+            margin-bottom: 30px;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        span {
+            font-weight: 600;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .normal { color: #00796b; }
+        .warning { color: #ffa000; }
+        .danger { color: #d32f2f; }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .button-group a {
+            background-color: #00796b;
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .button-group a:hover {
+            background-color: #004d40;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Hydration Status Result (with Calculation)</h1>
+
+    <p>Name: <span id="name"></span></p>
+    <p>Age: <span id="age"></span></p>
+    <p>Gender: <span id="gender"></span></p>
+    <p>Weight (kg): <span id="weight"></span></p>
+    <p>Height (cm): <span id="height"></span></p>
+
+    <h2>Step-by-step Calculation:</h2>
+    <p><b>Formula Used:</b></p>
+    <pre id="hydrationFormula"></pre>
+
+    <p><b>Calculation:</b></p>
+    <pre id="hydrationCalc"></pre>
+
+    <p>Your Hydration Status is: <span id="hydrationValue"></span> liters</p>
+
+    <h2>About Hydration Status:</h2>
+    <p>Hydration status reflects the amount of water in your body, which is crucial for maintaining normal physiological functions. Adequate hydration supports circulation, temperature regulation, digestion, and cognitive performance. Changes in hydration status may indicate fluid imbalance due to illness, physical activity, or environmental conditions. Total Body Water (TBW) can be estimated using anthropometric formulas such as Watson formula.</p>
+
+    <div class="button-group">
+        <a id="backLink" href="index.html">Back to Calculator</a>
+        <a href="https://www.sciencedirect.com/science/article/abs/pii/S0002916523437458?via%3Dihub" target="_blank">See More</a>
+    </div>
+</div>
+
+<script>
+    function calculateHydrationStatus(gender, age, weightKg, heightCm) {
+        let hydrationLiters = 0;
+        if (gender.toLowerCase() === "male") {
+            hydrationLiters = 2.447 - (0.09516 * age) + (0.1074 * heightCm) + (0.3362 * weightKg);
+        } else if (gender.toLowerCase() === "female") {
+            hydrationLiters = (0.1069 * heightCm) + (0.2466 * weightKg) - 2.097;
+        }
+        return hydrationLiters;
+    }
+
+    window.onload = function () {
+        const params = new URLSearchParams(window.location.search);
+
+        const name = params.get("name");
+        const ic = params.get("ic");
+        const gender = params.get("gender");
+        const weight = parseFloat(params.get("weight")) || 0;
+        const height = parseFloat(params.get("height")) || 0;
+        const age = parseInt(params.get("age")) || 0;
+
+        const hydration = calculateHydrationStatus(gender, age, weight, height);
+
+        document.getElementById("name").textContent = name || "Unknown";
+        document.getElementById("gender").textContent = gender || "N/A";
+        document.getElementById("weight").textContent = weight || "N/A";
+        document.getElementById("height").textContent = height || "N/A";
+        document.getElementById("age").textContent = age || "N/A";
+        document.getElementById("hydrationValue").textContent = hydration.toFixed(2);
+
+        let formulaText = "";
+        let calcText = "";
+        if (gender.toLowerCase() === "male") {
+            formulaText = "Male: 2.447 - (0.09516 × Age) + (0.1074 × Height_cm) + (0.3362 × Weight_kg)";
+            calcText = `2.447 - (0.09516 × ${age}) + (0.1074 × ${height}) + (0.3362 × ${weight})`;
+        } else if (gender.toLowerCase() === "female") {
+            formulaText = "Female: (0.1069 × Height_cm) + (0.2466 × Weight_kg) - 2.097";
+            calcText = `(${0.1069} × ${height}) + (${0.2466} × ${weight}) - 2.097`;
+        } else {
+            formulaText = "Invalid gender provided.";
+            calcText = "N/A";
+        }
+
+        document.getElementById("hydrationFormula").textContent = formulaText;
+        document.getElementById("hydrationCalc").textContent = calcText;
+
+        const backLink = document.getElementById("backLink");
+        const queryData = new URLSearchParams();
+        for (const [key, value] of params.entries()) {
+            if (key !== "hydration") {
+                queryData.append(key, value);
+            }
+        }
+        backLink.href = "index.html?" + queryData.toString();
+    };
+</script>
+
+</body>
+</html>

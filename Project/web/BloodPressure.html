@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Blood Pressure Calculator</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #e0f7fa, #80deea);
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                max-width: 700px;
+                margin: 50px auto;
+                background: #ffffff;
+                padding: 30px 40px;
+                border-radius: 15px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            }
+            h1 {
+                text-align: center;
+                color: #00796b;
+                margin-bottom: 30px;
+            }
+            label {
+                font-weight: bold;
+                margin-top: 15px;
+                display: block;
+            }
+            input[type="number"] {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                box-sizing: border-box;
+                margin-top: 5px;
+            }
+            button, a.button-link {
+                margin-top: 20px;
+                background-color: #00796b;
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                cursor: pointer;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 16px;
+                text-decoration: none;
+                display: inline-block;
+            }
+            button:hover, a.button-link:hover {
+                background-color: #004d40;
+            }
+            .result {
+                margin-top: 30px;
+                padding: 20px;
+                background: #ffffff;
+                border-radius: 12px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            }
+            .explanation-box {
+                margin-top: 20px;
+                padding: 15px;
+                border: 1px solid #ccc;
+                background: #fff6e0;
+                border-radius: 10px;
+            }
+            code {
+                background: #eef;
+                padding: 4px 6px;
+                border-radius: 4px;
+                font-family: monospace;
+            }
+            .danger { color: #d32f2f; font-weight: bold; }
+            .warning { color: #ffa000; font-weight: bold; }
+            .normal { color: #00796b; font-weight: bold; }
+
+            .quote-box {
+                margin-top: 20px;
+                padding: 15px;
+                border-left: 4px solid #00796b;
+                background: #e0f2f1;
+                border-radius: 10px;
+                font-style: italic;
+                font-size: 1.05em;
+                color: #333;
+                animation: fadeIn 1.5s ease;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🩺 Blood Pressure Calculator</h1>
+
+            <div class="explanation-box">
+                <h2>What is Systolic and Diastolic?</h2>
+                <p><strong>Systolic:</strong> The top number — it measures the pressure in your arteries when your heart beats (contracts).</p>
+                <p><strong>Diastolic:</strong> The bottom number — it measures the pressure in your arteries when your heart rests between beats.</p>
+                <p>Example: <strong>120/80 mmHg</strong> → 120 systolic, 80 diastolic.</p>
+            </div>
+
+            <form id="bpForm">
+                <label for="systolic">Systolic (mmHg):</label>
+                <input type="number" id="systolic" name="systolic" min="0" required />
+
+                <label for="diastolic">Diastolic (mmHg):</label>
+                <input type="number" id="diastolic" name="diastolic" min="0" required />
+
+                <button type="submit">Calculate Blood Pressure</button>
+            </form>
+
+            <div class="result" id="result" style="display:none;">
+                <h2>Blood Pressure Result</h2>
+
+                <p><b>Step 1 - User Info:</b></p>
+                <p>Name: <span id="resName"></span></p>
+                <p>Age: <span id="resAge"></span></p>
+                <p>Gender: <span id="resGender"></span></p>
+                <p>Weight (kg): <span id="resWeight"></span></p>
+                <p>Height (cm): <span id="resHeight"></span></p>
+
+                <p><b>Step 2 - Input Values:</b></p>
+                <p>Systolic: <span id="resSystolic"></span> mmHg</p>
+                <p>Diastolic: <span id="resDiastolic"></span> mmHg</p>
+
+                <p><b>Step 3 - Calculation:</b></p>
+                <p>Formula: <code>Score = (0.6 × Systolic) + (0.4 × Diastolic)</code></p>
+                <p>Calculation: <code id="resCalculation"></code></p>
+                <p>Score: <span id="resScore"></span></p>
+
+                <p><b>Step 4 - Classification:</b></p>
+                <p>Classification: <span id="resClassification"></span></p>
+
+                <div class="explanation-box">
+                    <p><b>Explanation:</b> <span id="resExplanation"></span></p>
+                </div>
+
+                <div class="quote-box" id="quoteBox"></div>
+
+                <p><a class="button-link" href="https://www.ahajournals.org/doi/pdf/10.1161/01.RES.5.6.589" target="_blank">View Original Study</a></p>
+            </div>
+
+            <a id="backButton" class="button-link" href="#">Back to Calculator</a>
+        </div>
+
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            const userData = {
+                name: params.get("name") || "Unknown",
+                age: parseInt(params.get("age")) || 0,
+                gender: params.get("gender") || "-",
+                weight: parseFloat(params.get("weight")) || 0,
+                height: parseFloat(params.get("height")) || 0,
+                ic: params.get("ic") || ""
+            };
+
+            const quotes = [
+                "“The greatest wealth is health.” – Virgil",
+                "“Take care of your body. It's the only place you have to live.” – Jim Rohn",
+                "“Health is not valued until sickness comes.” – Thomas Fuller",
+                "“To keep the body in good health is a duty.” – Buddha",
+                "“A healthy outside starts from the inside.” – Robert Urich"
+            ];
+
+            function getRandomQuote() {
+                return quotes[Math.floor(Math.random() * quotes.length)];
+            }
+
+            function classifyBloodPressure(systolic, diastolic) {
+                const score = 0.6 * systolic + 0.4 * diastolic;
+                if (score < 72) return "Low Blood Pressure (Hypotension)";
+                if (score < 104) return "Normal Blood Pressure";
+                if (score < 110) return "Elevated Blood Pressure";
+                if (score < 122) return "Hypertension Stage 1";
+                if (score <= 156) return "Hypertension Stage 2";
+                return "Hypertensive Crisis (Seek Emergency Care)";
+            }
+
+            function getExplanation(classification) {
+                const explanations = {
+                    "Low Blood Pressure (Hypotension)": "Your blood pressure is lower than normal. Consult doctor if symptoms occur.",
+                    "Normal Blood Pressure": "Your blood pressure is in the healthy range. Maintain your lifestyle.",
+                    "Elevated Blood Pressure": "Slightly elevated. Lifestyle changes may help prevent hypertension.",
+                    "Hypertension Stage 1": "Mild hypertension. Consult a healthcare professional.",
+                    "Hypertension Stage 2": "Moderately high. Medical attention may be necessary.",
+                    "Hypertensive Crisis (Seek Emergency Care)": "Dangerously high! Seek immediate care."
+                };
+                return explanations[classification] || "";
+            }
+
+            document.getElementById("bpForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+                const systolic = parseInt(document.getElementById("systolic").value);
+                const diastolic = parseInt(document.getElementById("diastolic").value);
+                const score = 0.6 * systolic + 0.4 * diastolic;
+                const classification = classifyBloodPressure(systolic, diastolic);
+                const explanation = getExplanation(classification);
+
+                document.getElementById("resName").textContent = userData.name;
+                document.getElementById("resAge").textContent = userData.age;
+                document.getElementById("resGender").textContent = userData.gender;
+                document.getElementById("resWeight").textContent = userData.weight.toFixed(1);
+                document.getElementById("resHeight").textContent = userData.height.toFixed(1);
+                document.getElementById("resSystolic").textContent = systolic;
+                document.getElementById("resDiastolic").textContent = diastolic;
+                document.getElementById("resScore").textContent = score.toFixed(2);
+                document.getElementById("resCalculation").textContent = `0.6 × ${systolic} + 0.4 × ${diastolic} = ${score.toFixed(2)}`;
+                const classElem = document.getElementById("resClassification");
+                classElem.textContent = classification;
+                classElem.className = classification.includes("Normal") ? "normal" :
+                    classification.includes("Elevated") || classification.includes("Stage") ? "warning" : "danger";
+                document.getElementById("resExplanation").textContent = explanation;
+
+                document.getElementById("quoteBox").textContent = getRandomQuote();
+                document.getElementById("result").style.display = "block";
+            });
+
+            document.getElementById("backButton").addEventListener("click", function () {
+                const query = new URLSearchParams({
+                    name: userData.name,
+                    age: userData.age,
+                    gender: userData.gender,
+                    weight: userData.weight,
+                    height: userData.height,
+                    ic: userData.ic
+                }).toString();
+                window.location.href = `index.html?${query}`;
+            });
+        </script>
+    </body>
+</html>

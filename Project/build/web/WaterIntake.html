@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Intake Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #80deea);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 750px;
+      margin: 50px auto;
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 25px;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    button, a.button-link {
+      margin-top: 20px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    button:hover, a.button-link:hover {
+      background-color: #004d40;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    .explanation-box {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      background: #fff6e0;
+      border-radius: 10px;
+    }
+    .quote-box {
+      margin-top: 20px;
+      padding: 10px;
+      border-left: 5px solid #00796b;
+      background: #f0f9ff;
+      border-radius: 10px;
+      font-style: italic;
+      color: #444;
+    }
+    .calc-details {
+      margin-top: 20px;
+      font-size: 0.95em;
+      color: #444;
+      line-height: 1.6;
+    }
+    .source-link {
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .source-link a {
+      color: #00796b;
+      text-decoration: none;
+    }
+    .source-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💧 Water Intake Calculator</h1>
+
+    <div class="explanation-box">
+      <h2>About Water Intake</h2>
+      <p>Water is essential for life. Your daily water needs depend on your weight and activity level. This calculator helps you estimate how much water you should drink daily to stay hydrated and healthy.</p>
+      <ul>
+        <li>Base Water: 35 mL × body weight (kg)</li>
+        <li>Activity Add-on: 12 mL × minutes of physical activity</li>
+      </ul>
+      <p><b>Note:</b> This is an estimate. For medical advice, consult a healthcare provider.</p>
+      <div class="source-link">
+        Source: <a href="https://www.acko.com/calculators/water-intake-calculator/" target="_blank">Acko Water Intake Calculator</a>
+      </div>
+    </div>
+
+    <form id="waterForm">
+      <label for="activityMinutes">Activity Duration (minutes):</label>
+      <input type="number" id="activityMinutes" name="activityMinutes" min="0" placeholder="Enter activity duration" required />
+
+      <button type="submit">Calculate Water Intake</button>
+    </form>
+
+    <div class="result" id="result" style="display:none;">
+      <h2>Water Intake Result</h2>
+      <p><b>Name:</b> <span id="resName"></span></p>
+      <p><b>Age:</b> <span id="resAge"></span></p>
+      <p><b>Gender:</b> <span id="resGender"></span></p>
+      <p><b>Weight (kg):</b> <span id="resWeight"></span></p>
+      <p><b>Height (cm):</b> <span id="resHeight"></span></p>
+      <p><b>Activity Duration (minutes):</b> <span id="resActivity"></span></p>
+      <p><b>Recommended Water Intake:</b> <span id="resWaterIntake"></span> liters/day</p>
+
+      <div class="calc-details" id="calcDetails"></div>
+      <div class="quote-box" id="quoteBox"></div>
+    </div>
+
+    <a id="backButton" class="button-link" href="#">Back to Calculator</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const userData = {
+      name: params.get("name") || "Unknown",
+      age: parseInt(params.get("age")) || 0,
+      gender: params.get("gender") || "-",
+      weight: parseFloat(params.get("weight")) || 0,
+      height: parseFloat(params.get("height")) || 0,
+      ic: params.get("ic") || ""
+    };
+
+    const quotes = [
+      "“Drinking water is like washing out your insides.” – Kevin R. Stone",
+      "“Pure water is the world’s first and foremost medicine.” – Slovakian Proverb",
+      "“You are not sick, you are thirsty.” – F. Batmanghelidj",
+      "“Water is life’s matter and matrix, mother and medium. There is no life without water.” – Albert Szent-Gyorgyi",
+      "“Thousands have lived without love, not one without water.” – W.H. Auden",
+      "“Stay hydrated, stay healthy.” – Anonymous"
+    ];
+
+    function getRandomQuote() {
+      return quotes[Math.floor(Math.random() * quotes.length)];
+    }
+
+    function calculateWaterIntake(weightKg, activityMinutes) {
+      const baseMl = 35 * weightKg;
+      const activityMl = 12 * activityMinutes;
+      const totalMl = baseMl + activityMl;
+      return {
+        baseMl,
+        activityMl,
+        totalMl,
+        waterIntake: (totalMl / 1000).toFixed(2)
+      };
+    }
+
+    document.getElementById("waterForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const activityMinutes = parseInt(document.getElementById("activityMinutes").value);
+      if (isNaN(activityMinutes) || activityMinutes < 0) {
+        alert("Please enter a valid activity duration.");
+        return;
+      }
+
+      const result = calculateWaterIntake(userData.weight, activityMinutes);
+
+      document.getElementById("resName").textContent = userData.name;
+      document.getElementById("resAge").textContent = userData.age;
+      document.getElementById("resGender").textContent = userData.gender;
+      document.getElementById("resWeight").textContent = userData.weight.toFixed(1);
+      document.getElementById("resHeight").textContent = userData.height.toFixed(1);
+      document.getElementById("resActivity").textContent = activityMinutes;
+      document.getElementById("resWaterIntake").textContent = result.waterIntake;
+      document.getElementById("quoteBox").textContent = getRandomQuote();
+      document.getElementById("result").style.display = "block";
+
+      document.getElementById("calcDetails").innerHTML = `
+        <h3>Calculation Details</h3>
+        <p><strong>Formula:</strong> (35 × weight) + (12 × activityMinutes)</p>
+        <p>Base Water: 35 × ${userData.weight.toFixed(1)} = <strong>${result.baseMl.toFixed(0)} mL</strong></p>
+        <p>Activity Add-on: 12 × ${activityMinutes} = <strong>${result.activityMl.toFixed(0)} mL</strong></p>
+        <p>Total Water: ${result.baseMl.toFixed(0)} + ${result.activityMl.toFixed(0)} = <strong>${result.totalMl.toFixed(0)} mL</strong></p>
+        <p><strong>Converted to liters:</strong> ${result.waterIntake} liters/day</p>
+      `;
+    });
+
+    document.getElementById("backButton").addEventListener("click", function () {
+      const query = new URLSearchParams({
+        name: userData.name,
+        age: userData.age,
+        gender: userData.gender,
+        weight: userData.weight,
+        height: userData.height,
+        ic: userData.ic
+      }).toString();
+      window.location.href = `index.html?${query}`;
+    });
+  </script>
+</body>
+</html>

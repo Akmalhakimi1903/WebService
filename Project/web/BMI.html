@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BMI Result with Calculation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        span {
+            font-weight: 600;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .normal { color: #00796b; }
+        .warning { color: #ffa000; }
+        .danger { color: #d32f2f; }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .button-group a {
+            background-color: #00796b;
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .button-group a:hover {
+            background-color: #004d40;
+        }
+
+        .explanation {
+            background-color: #e0f2f1;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>BMI Result (with Calculation)</h1>
+
+    <p>Name: <span id="name"></span></p>
+    <p>Age: <span id="age"></span></p>
+    <p>Gender: <span id="gender"></span></p>
+    <p>Weight (kg): <span id="weight"></span></p>
+    <p>Height (cm): <span id="height"></span></p>
+
+    <h2>Step-by-step Calculation:</h2>
+    <p><b>Formula Used:</b></p>
+    <pre id="bmiFormula"></pre>
+
+    <p><b>Calculation:</b></p>
+    <pre id="bmiCalc"></pre>
+
+    <p>Your BMI is: <span id="bmiValue"></span></p>
+    <p>Your BMI Category is: <span id="bmiCategory"></span></p>
+
+    <div class="explanation">
+        <h2>What is BMI?</h2>
+        <p>BMI (Body Mass Index) is a simple calculation using height and weight to estimate body fat.</p>
+        <p><b>Formula:</b> BMI = weight (kg) / (height (m))²</p>
+
+        <p><b>BMI Categories:</b></p>
+        <ul>
+            <li>Underweight: BMI &lt; 18.5</li>
+            <li>Normal weight: 18.5 - 24.9</li>
+            <li>Overweight: 25 - 29.9</li>
+            <li>Obesity: BMI ≥ 30</li>
+        </ul>
+
+        <p><b>Limitations:</b> BMI does not differentiate between muscle and fat, and may not be accurate for athletes, older adults, or certain ethnic groups. It is a useful screening tool but not a diagnostic tool.</p>
+        <p><b>Why BMI matters:</b> High BMI may increase the risk for heart disease, diabetes, stroke, certain cancers, and other health issues.</p>
+    </div>
+
+    <div class="button-group">
+        <a id="backLink" href="index.html">Back to Calculator</a>
+        <a href="https://my.clevelandclinic.org/health/articles/9464-body-mass-index-bmi" target="_blank">See More</a>
+    </div>
+</div>
+
+<script>
+    function calculateBMI(weightKg, heightCm) {
+        let heightM = heightCm / 100;
+        return weightKg / (heightM * heightM);
+    }
+
+    function classifyBMI(bmi) {
+        if (bmi < 18.5) {
+            return { category: "Underweight (BMI < 18.5)", cssClass: "warning" };
+        } else if (bmi < 24.9) {
+            return { category: "Normal weight (18.5 - 24.9)", cssClass: "normal" };
+        } else if (bmi < 29.9) {
+            return { category: "Overweight (25 - 29.9)", cssClass: "warning" };
+        } else {
+            return { category: "Obesity (BMI ≥ 30)", cssClass: "danger" };
+        }
+    }
+
+    window.onload = function () {
+        const params = new URLSearchParams(window.location.search);
+
+        const name = params.get("name");
+        const ic = params.get("ic");
+        const gender = params.get("gender");
+        const weight = parseFloat(params.get("weight")) || 0;
+        const height = parseFloat(params.get("height")) || 0;
+        const age = params.get("age");
+
+        const bmi = calculateBMI(weight, height);
+        const classification = classifyBMI(bmi);
+
+        document.getElementById("name").textContent = name || "Unknown";
+        document.getElementById("gender").textContent = gender || "N/A";
+        document.getElementById("weight").textContent = weight || "N/A";
+        document.getElementById("height").textContent = height || "N/A";
+        document.getElementById("age").textContent = age || "N/A";
+        document.getElementById("bmiValue").textContent = bmi.toFixed(2);
+        document.getElementById("bmiCategory").textContent = classification.category;
+        document.getElementById("bmiCategory").className = classification.cssClass;
+
+        document.getElementById("bmiFormula").textContent = "BMI = weight (kg) / (height (m))²";
+        document.getElementById("bmiCalc").textContent =
+            `BMI = ${weight} / (${(height/100).toFixed(2)} × ${(height/100).toFixed(2)})`;
+
+        const backLink = document.getElementById("backLink");
+        const queryData = new URLSearchParams();
+        for (const [key, value] of params.entries()) {
+            if (key !== "bmi") {
+                queryData.append(key, value);
+            }
+        }
+        backLink.href = "index.html?" + queryData.toString();
+    };
+</script>
+
+</body>
+</html>
